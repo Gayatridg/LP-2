@@ -1,0 +1,141 @@
+from collections import defaultdict, deque
+import networkx as nx
+import matplotlib.pyplot as plt
+
+class Graph:
+    def __init__(self):
+        self.graph = defaultdict(list)
+        self.visited = set()
+        self.bfs_result = []
+
+    def add_edge(self, u, v):
+        self.graph[u].append(v)
+        self.graph[v].append(u)
+
+    def print_graph(self):
+        print("\n--- Graph Adjacency List ---")
+        for node in sorted(self.graph):
+            print(f"{node}: {sorted(self.graph[node])}")
+
+    def bfs(self, start_node):
+        queue = deque([start_node])  # Initialize the queue with the starting node
+        self.visited.add(start_node)
+
+        print(f"\n--- BFS Traversal ---")
+        print(f"Queue: {list(queue)}")  # Print initial queue containing the start node
+
+        while queue:
+            node = queue.popleft()  # Dequeue the front element
+            self.bfs_result.append(node)
+
+            print(f"Visiting: {node}")
+            
+            # Add unvisited neighbors to the queue
+            for neighbor in sorted(self.graph[node]):
+                if neighbor not in self.visited:
+                    self.visited.add(neighbor)
+                    queue.append(neighbor)
+                    print(f"Adding {neighbor} to the queue")
+            
+            print(f"Queue: {list(queue)}")
+
+    def visualize_graph(self):
+        G = nx.Graph()
+
+        # Add edges to the graph
+        for u in self.graph:
+            for v in self.graph[u]:
+                G.add_edge(u, v)
+
+        # Define position layout
+        pos = nx.spring_layout(G)
+
+        # Highlight the BFS edges
+        bfs_edges = [(self.bfs_result[i], self.bfs_result[i+1]) for i in range(len(self.bfs_result) - 1)]
+
+        # Draw the graph with node labels
+        nx.draw(G, pos, with_labels=True, node_color='skyblue', node_size=2000, font_size=16, edge_color='gray')
+
+        # Highlight BFS traversal path in red
+        nx.draw_networkx_edges(G, pos, edgelist=bfs_edges, edge_color='red', width=2)
+
+        plt.title("Graph Visualization with BFS Path Highlighted")
+        plt.show()
+
+def main():
+    g = Graph()
+
+    # Input the number of nodes and the edges
+    num_nodes = int(input("Enter number of nodes: "))
+    print("Enter node names (space-separated):")
+    node_names = input().split()
+
+    num_edges = int(input("Enter number of edges: "))
+    print("Enter edges (e.g., A B):")
+    for _ in range(num_edges):
+        u, v = input().split()
+        g.add_edge(u, v)
+
+    g.print_graph()
+
+    # Input starting node for BFS
+    start_node = input("\nEnter starting node: ")
+
+    g.bfs(start_node)
+
+    print("\nBFS:", g.bfs_result)
+
+    print("\nDisplaying graph with BFS path highlighted...")
+    g.visualize_graph()
+
+if __name__ == "__main__":
+    main()
+
+
+#output
+Enter number of nodes: 6
+Enter node names (space-separated):
+a b c d e f
+Enter number of edges: 7
+Enter edges (e.g., A B):
+a b
+b c
+c d
+a d
+e d
+f e
+f a
+
+--- Graph Adjacency List ---
+a: ['b', 'd', 'f']
+b: ['a', 'c']
+c: ['b', 'd']
+d: ['a', 'c', 'e']
+e: ['d', 'f']
+f: ['a', 'e']
+
+Enter starting node: f
+
+--- BFS Traversal ---
+Queue: ['f']
+Visiting: f
+Adding a to the queue
+Adding e to the queue
+Queue: ['a', 'e']
+Visiting: a
+Adding b to the queue
+Adding d to the queue
+Queue: ['e', 'b', 'd']
+Visiting: e
+Queue: ['b', 'd']
+Visiting: b
+Adding c to the queue
+Queue: ['d', 'c']
+Visiting: d
+Queue: ['c']
+Visiting: c
+Queue: []
+
+BFS: ['f', 'a', 'e', 'b', 'd', 'c']
+
+Displaying graph with BFS path highlighted...
