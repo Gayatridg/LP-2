@@ -1,0 +1,111 @@
+import heapq
+import networkx as nx
+import matplotlib.pyplot as plt
+
+def visualize_graph(graph, edges, title="Graph Visualization"):
+    G = nx.Graph()
+    for node in graph:
+        G.add_node(node)
+    for edge in edges:
+        u, v, w = edge
+        G.add_edge(u, v, weight=w)
+
+    pos = nx.circular_layout(G)
+    labels = nx.get_edge_attributes(G, 'weight')
+
+    plt.clf()
+    nx.draw(G, pos, with_labels=True, node_color='lightblue', edge_color='gray')
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+    plt.title(title)
+    plt.pause(1)
+
+def prims_algorithm(graph, start_node):
+    n = len(graph)
+    mst = []
+    visited = set()
+    min_heap = [(0, start_node, None)]
+    heapq.heapify(min_heap)
+    total_cost = 0
+
+    all_edges = []
+    for node in graph:
+        for neighbor, weight in graph[node]:
+            if (neighbor, node, weight) not in all_edges:
+                all_edges.append((node, neighbor, weight))
+
+    plt.ion()
+    visualize_graph(graph, all_edges, "Initial Graph")
+
+    while len(mst) < n - 1 and min_heap:
+        cost, node, parent = heapq.heappop(min_heap)
+
+        if node in visited:
+            continue
+
+        visited.add(node)
+        if parent is not None:
+            mst.append((parent, node, cost))
+            total_cost += cost
+            visualize_graph(graph, mst, "Minimum Spanning Tree (Prim's Algorithm)")
+
+        for neighbor, weight in graph[node]:
+            if neighbor not in visited:
+                heapq.heappush(min_heap, (weight, neighbor, node))
+
+    print("Minimum Spanning Tree (MST) Edges:")
+    for edge in mst:
+        print(edge)
+    print(f"Total Cost of MST: {total_cost}")
+    plt.ioff()
+    plt.show()
+    return mst, total_cost
+# User Input
+graph = {}
+n = int(input("Enter the number of nodes: "))
+
+for i in range(n):
+    node = int(input(f"Enter node {i + 1}: "))
+    graph[node] = []
+    edges_count = int(input(f"Enter the number of edges for node {node}: "))
+    
+    for _ in range(edges_count):
+        neighbor, weight = map(int, input("Enter neighbor and weight (space-separated): ").split())
+        graph[node].append((neighbor, weight))
+        
+        if neighbor not in graph:
+            graph[neighbor] = []
+        graph[neighbor].append((node, weight))
+
+start_node = int(input("Enter start node: "))
+prims_algorithm(graph, start_node)
+
+
+#output
+Enter the number of nodes: 4
+Enter node 1: 0
+Enter the number of edges for node 0: 2
+Enter neighbor and weight (space-separated): 1 5
+Enter neighbor and weight (space-separated): 2 8
+Enter node 2: 1
+Enter the number of edges for node 1: 3
+Enter neighbor and weight (space-separated): 0 5
+Enter neighbor and weight (space-separated): 2 9
+Enter neighbor and weight (space-separated): 3 2
+Enter node 3: 2
+Enter the number of edges for node 2: 3
+Enter neighbor and weight (space-separated): 1 9
+Enter neighbor and weight (space-separated): 0 8
+Enter neighbor and weight (space-separated): 3 6
+Enter node 4: 3
+Enter the number of edges for node 3: 2
+Enter neighbor and weight (space-separated): 1 2
+Enter neighbor and weight (space-separated): 2 6
+Enter start node: 0
+
+
+Minimum Spanning Tree (MST) Edges:
+(0, 1, 5)
+(1, 3, 2)
+(3, 2, 6)
+Total Cost of MST: 13
+([(0, 1, 5), (1, 3, 2), (3, 2, 6)], 13)
