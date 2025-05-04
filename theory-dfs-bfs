@@ -1,0 +1,74 @@
+Theory_dfs&bfs
+
+
+Sure! Let me explain DFS and BFS in simpler terms:
+
+DFS (Depth-First Search)
+DFS means you start at one point in the graph and go as deep as possible down one path before backtracking. It's like exploring one branch of a tree all the way to the end before you check out other branches.
+
+Recursive DFS is a way to do this where the computer calls itself to go deeper into the graph. It uses a stack to remember which nodes to visit next.
+
+How DFS works:
+Start at the first node.
+
+Visit that node.
+
+Go to a neighboring node and repeat until you can't go any further.
+
+Once you hit a dead-end (no more neighbors), go back to the previous node and try another path.
+
+Example:
+If the graph looks like this:
+
+mathematica
+Copy
+Edit
+A -- B -- C
+|    |
+D -- E
+Starting at A, the DFS order could be:
+A -> B -> C -> E -> D
+
+BFS (Breadth-First Search)
+BFS means you explore all the neighbors of a node first before going deeper. It's like if you're in a building and you visit all the rooms on the first floor before going to the next floor.
+
+Recursive BFS is not the usual way, but you can simulate it. Normally, BFS uses a queue to keep track of which node to visit next.
+
+How BFS works:
+Start at the first node.
+
+Visit that node, then visit all of its neighbors (the nodes directly connected to it).
+
+After visiting the first level of neighbors, move on to the next level (nodes connected to the neighbors).
+
+Repeat until there are no more nodes to visit.
+
+Example:
+If the graph looks like this:
+
+mathematica
+Copy
+Edit
+A -- B -- C
+|    |
+D -- E
+Starting at A, the BFS order could be:
+A -> B -> D -> C -> E
+
+Key Differences Between DFS and BFS:
+DFS:
+
+Explores deep into the graph first.
+
+It’s like going down a path until you can’t go further, and then backtracking to try another path.
+
+Example: Going down one long hallway in a house, checking every room until you hit a dead-end.
+
+BFS:
+
+Explores wide first. It checks all nodes that are directly connected before going deeper.
+
+It’s like checking all rooms on the same floor before going to the next floor.
+
+Example: Visiting every room on the current floor before moving up to the next floor.
+
