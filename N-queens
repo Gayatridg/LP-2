@@ -1,0 +1,68 @@
+def solve_n_queens_one_solution(n):
+    board = [-1] * n  # board[i] = column index of queen in row i
+    solution_found = [False]  # Mutable flag to stop after one solution
+
+    def print_board(current_board):
+        for i in range(n):
+            row = ['.'] * n
+            if current_board[i] != -1:
+                row[current_board[i]] = 'Q'
+            print(' '.join(row))
+        print()
+
+    def is_safe(row, col, cols, pos_diags, neg_diags):
+        # Branch and Bound: prune invalid columns and diagonals
+        return (col not in cols and
+                (row + col) not in pos_diags and
+                (row - col) not in neg_diags)
+
+    def backtrack(row, cols, pos_diags, neg_diags):
+        if row == n:
+            print("Valid solution found:")
+            print_board(board)
+            solution_found[0] = True
+            return
+
+        queen_number = row + 1
+
+        for col in range(n):
+            print(f"Trying to place Queen {queen_number} at position ({row}, {col})")
+
+            if is_safe(row, col, cols, pos_diags, neg_diags):
+                print(f"Placed Queen {queen_number} at ({row}, {col})")
+                board[row] = col
+                cols.add(col)
+                pos_diags.add(row + col)
+                neg_diags.add(row - col)
+
+                print_board(board)
+
+                backtrack(row + 1, cols, pos_diags, neg_diags)
+
+                if solution_found[0]:
+                    return  # Stop after first solution
+
+                # Backtracking: remove queen and try next column
+                print(f"Backtracking Queen {queen_number} from ({row}, {col})")
+                board[row] = -1
+                cols.remove(col)
+                pos_diags.remove(row + col)
+                neg_diags.remove(row - col)
+
+                print_board(board)
+            else:
+                print(f"Cannot place Queen {queen_number} at ({row}, {col})")
+
+    backtrack(0, set(), set(), set())
+
+
+# Main program
+if __name__ == "__main__":
+    try:
+        n = int(input("Enter the value of N for the N-Queens problem: "))
+        if n <= 0:
+            print("Please enter a positive integer greater than 0.")
+        else:
+            solve_n_queens_one_solution(n)
+    except ValueError:
+        print("Invalid input. Please enter an integer.")
