@@ -1,0 +1,116 @@
+from collections import defaultdict
+import networkx as nx
+import matplotlib.pyplot as plt
+
+class Graph:
+    def __init__(self):
+        self.graph = defaultdict(list)
+        self.visited = set()
+        self.dfs_result = []
+
+    def add_edge(self, u, v):
+        self.graph[u].append(v)
+        self.graph[v].append(u)
+
+    def print_graph(self):
+        print("\n--- Graph Adjacency List ---")
+        for node in sorted(self.graph):
+            print(f"{node}: {sorted(self.graph[node])}")
+
+    def dfs(self, node, stack=None):
+        if stack is None:
+            stack = []
+
+        self.visited.add(node)
+        self.dfs_result.append(node)
+        stack.append(node)
+
+        print(f"Stack: {stack}")
+        print(f"Visiting: {node}")
+
+        for neighbor in sorted(self.graph[node]):
+            if neighbor not in self.visited:
+                self.dfs(neighbor, stack)
+
+        stack.pop()
+
+    def visualize_graph(self):
+        G = nx.Graph()
+        for u in self.graph:
+            for v in self.graph[u]:
+                G.add_edge(u, v)
+        
+        pos = nx.spring_layout(G)
+        nx.draw(G, pos, with_labels=True, node_color='skyblue', node_size=2000, font_size=16, edge_color='gray')
+        plt.title("Graph Visualization")
+        plt.show()
+
+def main():
+    g = Graph()
+
+    num_nodes = int(input("Enter number of nodes: "))
+    print("Enter node names (space-separated):")
+    node_names = input().split()
+
+    num_edges = int(input("Enter number of edges: "))
+    print("Enter edges (e.g., A B):")
+    for _ in range(num_edges):
+        u, v = input().split()
+        g.add_edge(u, v)
+
+    g.print_graph()
+
+    start_node = input("\nEnter starting node: ")
+    
+    print("\nDisplaying graph...")
+    g.visualize_graph()
+
+    print("\n--- DFS Traversal ---")
+    g.dfs(start_node)
+
+    print("\nDFS:", g.dfs_result)
+
+    
+
+if __name__ == "__main__":
+    main()
+
+
+#ouput:
+Enter number of nodes: 5
+Enter node names (space-separated):
+A B C D E
+Enter number of edges: 6
+Enter edges (e.g., A B):
+A B
+A C
+B D
+C D
+D E
+B E
+
+--- Graph Adjacency List ---
+A: ['B', 'C']
+B: ['A', 'D', 'E']
+C: ['A', 'D']
+D: ['B', 'C', 'E']
+E: ['B', 'D']
+
+Enter starting node: A
+
+Displaying graph...
+
+
+--- DFS Traversal ---
+Stack: ['A']
+Visiting: A
+Stack: ['A', 'B']
+Visiting: B
+Stack: ['A', 'B', 'D']
+Visiting: D
+Stack: ['A', 'B', 'D', 'C']
+Visiting: C
+Stack: ['A', 'B', 'D', 'E']
+Visiting: E
+
+DFS: ['A', 'B', 'D', 'C', 'E']
