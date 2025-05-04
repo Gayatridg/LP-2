@@ -1,0 +1,89 @@
+import networkx as nx
+import matplotlib.pyplot as plt
+
+def is_valid(node, color, graph, color_assignment):
+    # Branch and Bound: pruning invalid color assignments
+    for neighbor in graph[node]:
+        if color_assignment[neighbor] == color:
+            return False
+    return True
+
+def graph_coloring(graph, m):
+    color_assignment = {node: 0 for node in graph}
+    steps = []
+
+    def backtrack(node_index):
+        # If all nodes are assigned a color
+        if node_index == len(graph):
+            steps.append(color_assignment.copy())
+            return True  # Stop after first solution
+
+        node = list(graph.keys())[node_index]
+        for color in range(1, m + 1):
+            print(f"Trying color {color} for node {node}")
+
+            if is_valid(node, color, graph, color_assignment):
+                # Assign color
+                color_assignment[node] = color
+                print(f"Assigned color {color} to node {node}")
+                steps.append(color_assignment.copy())
+
+                if backtrack(node_index + 1):
+                    return True  # Found solution
+
+                # Backtracking: undo assignment
+                print(f"Backtracking on node {node}, removing color {color}")
+                color_assignment[node] = 0
+                steps.append(color_assignment.copy())
+            else:
+                print(f"Cannot assign color {color} to node {node} (branch pruned)")
+
+        return False  # No valid color found
+
+    success = backtrack(0)
+    return success, color_assignment, steps
+
+def draw_graph(graph, color_assignment, title):
+    G = nx.Graph()
+    for node in graph:
+        for neighbor in graph[node]:
+            G.add_edge(node, neighbor)
+
+    colors = []
+    color_map = ['grey', 'red', 'blue', 'green', 'yellow', 'purple', 'orange']
+
+    for node in G.nodes():
+        c = color_assignment[node]
+        colors.append(color_map[c] if c < len(color_map) else 'black')
+
+    pos = nx.spring_layout(G)
+    nx.draw(G, pos, with_labels=True, node_color=colors, node_size=800, font_color='white')
+    plt.title(title)
+    plt.show()
+
+def get_user_input_graph():
+    n = int(input("Enter number of nodes: "))
+    e = int(input("Enter number of edges: "))
+    graph = {i: [] for i in range(n)}
+
+    print("Enter edges (node1 node2):")
+    for _ in range(e):
+        u, v = map(int, input().split())
+        graph[u].append(v)
+        graph[v].append(u)
+    
+    m = int(input("Enter number of colors: "))
+    return graph, m
+
+# Main
+if __name__ == "__main__":
+    graph, m = get_user_input_graph()
+    success, color_assignment, steps = graph_coloring(graph, m)
+
+    if success:
+        print("\nGraph successfully colored using", m, "colors:")
+        print(color_assignment)
+        draw_graph(graph, color_assignment, "Final Colored Graph")
+    else:
+        print("No solution exists with", m, "colors.")
+
