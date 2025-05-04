@@ -1,0 +1,83 @@
+from collections import defaultdict
+
+class Graph:
+    def __init__(self):
+        self.graph = defaultdict(list)
+        self.visited = set()
+        self.dfs_result = []
+
+    def add_edge(self, u, v):
+        self.graph[u].append(v)
+        self.graph[v].append(u)
+
+    def dfs(self, node, stack=None):
+        if stack is None:
+            stack = []
+
+        self.visited.add(node)
+        self.dfs_result.append(node)
+        stack.append(node)
+
+        print(f"Stack: {stack}")
+        print(f"Visiting: {node}")
+
+        for neighbor in sorted(self.graph[node]):
+            if neighbor not in self.visited:
+                self.dfs(neighbor, stack)
+
+        stack.pop()
+
+def main():
+    g = Graph()
+
+    num_nodes = int(input("Enter number of nodes: "))
+    print("Enter node names (space-separated):")
+    node_names = input().split()
+
+    num_edges = int(input("Enter number of edges: "))
+    print("Enter edges (e.g., A B):")
+    for _ in range(num_edges):
+        u, v = input().split()
+        g.add_edge(u, v)
+
+    start_node = input("Enter starting node: ")
+
+    print("\n--- DFS Traversal ---" )
+    g.dfs(start_node)
+
+    print("\nDFS:", g.dfs_result)
+
+if __name__ == "__main__":
+    main()
+
+
+#Output:
+Enter number of nodes: 6
+Enter node names (space-separated):
+a b c d e f 
+Enter number of edges: 8
+Enter edges (e.g., A B):
+a b
+b d
+c d
+a c
+c e
+b e
+b c
+d e
+Enter starting node: a
+
+--- DFS Traversal ---
+Stack: ['a']
+Visiting: a
+Stack: ['a', 'b']
+Visiting: b
+Stack: ['a', 'b', 'c']
+Visiting: c
+Stack: ['a', 'b', 'c', 'd']
+Visiting: d
+Stack: ['a', 'b', 'c', 'd', 'e']
+Visiting: e
+
+DFS: ['a', 'b', 'c', 'd', 'e']
+​
