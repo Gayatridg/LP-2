@@ -1,0 +1,148 @@
+import heapq
+import copy
+
+def heuristic(state, goal):
+    """Calculates the Manhattan distance heuristic."""
+    distance = 0
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] != 0:
+                x, y = divmod(goal.index(state[i][j]), 3)
+                distance += abs(x - i) + abs(y - j)
+    return distance
+
+def get_blank_position(state):
+    """Finds the blank (zero) position."""
+    for i in range(3):
+        for j in range(3):
+            if state[i][j] == 0:
+                return i, j
+
+def generate_moves(state):
+    """Generates possible moves from the current state."""
+    x, y = get_blank_position(state)
+    moves = []
+    directions = [(-1, 0, "Up"), (1, 0, "Down"), (0, -1, "Left"), (0, 1, "Right")]  # Up, Down, Left, Right
+    for dx, dy, move in directions:
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < 3 and 0 <= ny < 3:
+            new_state = copy.deepcopy(state)
+            new_state[x][y], new_state[nx][ny] = new_state[nx][ny], new_state[x][y]
+            moves.append((new_state, move))
+    return moves
+
+def a_star(initial, goal):
+    """Solves the 8-puzzle using A* algorithm."""
+    goal_flat = sum(goal, [])  # Flatten goal state for easier index lookup
+    priority_queue = []
+    heapq.heappush(priority_queue, (0, initial, [], 0))  # (f_score, state, path, g_score)
+    visited = set()
+    
+    while priority_queue:
+        _, current, path, g_score = heapq.heappop(priority_queue)
+        
+        if current == goal:
+            return path + [(current, "Goal")]  # Return path including final state
+        
+        state_tuple = tuple(map(tuple, current))
+        if state_tuple in visited:
+            continue
+        visited.add(state_tuple)
+        
+        for new_state, move in generate_moves(current):
+            new_g = g_score + 1
+            new_f = new_g + heuristic(new_state, goal_flat)
+            heapq.heappush(priority_queue, (new_f, new_state, path + [(current, move)], new_g))
+
+    return None  # No solution found
+
+def print_puzzle(state):
+    """Prints the 8-puzzle state in a readable format."""
+    for row in state:
+        print(" ".join(str(num) if num != 0 else "_" for num in row))
+    print()
+
+def main():
+    initial = []
+    goal = []
+    
+    print("Enter initial state (3x3 grid, row-wise, use 0 for blank):")
+    for _ in range(3):
+        initial.append(list(map(int, input().split())))
+        
+    print("Enter goal state (3x3 grid, row-wise, use 0 for blank):")
+    for _ in range(3):
+        goal.append(list(map(int, input().split())))
+    
+    solution = a_star(initial, goal)
+    
+    if solution:
+        print("Solution found! Steps:")
+        for step, (state, move) in enumerate(solution):
+            print(f"Step {step}: Move {move}")
+            print_puzzle(state)
+    else:
+        print("No solution found.")
+
+if __name__ == "__main__":
+    main()
+
+OUTput:
+Enter initial state (3x3 grid, row-wise, use 0 for blank):
+1 2 3
+0 5 8
+4 6 7
+Enter goal state (3x3 grid, row-wise, use 0 for blank):
+1 2 3
+4 5 6
+7 8 0
+Solution found! Steps:
+Step 0: Move Right
+1 2 3
+_ 5 8
+4 6 7
+
+Step 1: Move Down
+1 2 3
+5 _ 8
+4 6 7
+
+Step 2: Move Right
+1 2 3
+5 6 8
+4 _ 7
+
+Step 3: Move Up
+1 2 3
+5 6 8
+4 7 _
+
+Step 4: Move Left
+1 2 3
+5 6 _
+4 7 8
+
+Step 5: Move Left
+1 2 3
+5 _ 6
+4 7 8
+
+Step 6: Move Down
+1 2 3
+_ 5 6
+4 7 8
+
+Step 7: Move Right
+1 2 3
+4 5 6
+_ 7 8
+
+Step 8: Move Right
+1 2 3
+4 5 6
+7 _ 8
+
+Step 9: Move Goal
+1 2 3
+4 5 6
+7 8 _
