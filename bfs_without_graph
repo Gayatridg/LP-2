@@ -1,0 +1,111 @@
+from collections import defaultdict, deque
+
+class Graph:
+    def __init__(self):
+        self.graph = defaultdict(list)
+        self.visited = set()
+        self.bfs_result = []
+
+    def add_edge(self, u, v):
+        self.graph[u].append(v)
+        self.graph[v].append(u)
+
+    def print_graph(self):
+        print("\n--- Graph Adjacency List ---")
+        for node in sorted(self.graph):
+            print(f"{node}: {sorted(self.graph[node])}")
+
+    def bfs(self, start_node):
+        queue = deque([start_node])  # Initialize the queue with the starting node
+        self.visited.add(start_node)
+
+        print(f"\n--- BFS Traversal ---")
+        print(f"Queue: {list(queue)}")  # Print initial queue containing the start node
+
+        while queue:
+            node = queue.popleft()  # Dequeue the front element
+            self.bfs_result.append(node)
+
+            print(f"Visiting: {node}")
+            
+            # Add unvisited neighbors to the queue
+            for neighbor in sorted(self.graph[node]):
+                if neighbor not in self.visited:
+                    self.visited.add(neighbor)
+                    queue.append(neighbor)
+                    print(f"Adding {neighbor} to the queue")
+            
+            print(f"Queue: {list(queue)}")
+
+def main():
+    g = Graph()
+
+    # Input the number of nodes and the edges
+    num_nodes = int(input("Enter number of nodes: "))
+    print("Enter node names (space-separated):")
+    node_names = input().split()
+
+    num_edges = int(input("Enter number of edges: "))
+    print("Enter edges (e.g., A B):")
+    for _ in range(num_edges):
+        u, v = input().split()
+        g.add_edge(u, v)
+
+    g.print_graph()
+
+    # Input starting node for BFS
+    start_node = input("\nEnter starting node: ")
+
+    g.bfs(start_node)
+
+    print("\nBFS:", g.bfs_result  )
+
+if __name__ == "__main__":
+    main()
+
+#output
+Enter number of nodes: 6
+Enter node names (space-separated):
+a b c d e f
+Enter number of edges: 8
+Enter edges (e.g., A B):
+a b
+b c
+c d
+d e
+e f
+f a
+d b
+a e
+
+--- Graph Adjacency List ---
+a: ['b', 'e', 'f']
+b: ['a', 'c', 'd']
+c: ['b', 'd']
+d: ['b', 'c', 'e']
+e: ['a', 'd', 'f']
+f: ['a', 'e']
+
+Enter starting node: a
+
+--- BFS Traversal ---
+Queue: ['a']
+Visiting: a
+Adding b to the queue
+Adding e to the queue
+Adding f to the queue
+Queue: ['b', 'e', 'f']
+Visiting: b
+Adding c to the queue
+Adding d to the queue
+Queue: ['e', 'f', 'c', 'd']
+Visiting: e
+Queue: ['f', 'c', 'd']
+Visiting: f
+Queue: ['c', 'd']
+Visiting: c
+Queue: ['d']
+Visiting: d
+Queue: []
+
+BFS: ['a', 'b', 'e', 'f', 'c', 'd']
