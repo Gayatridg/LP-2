@@ -1,0 +1,51 @@
+# Job class
+class Job:
+    def __init__(self, job_id, deadline, profit):
+        self.job_id = job_id
+        self.deadline = deadline
+        self.profit = profit
+
+# Greedy job scheduling function
+def job_scheduling(jobs):
+    # Sort jobs by descending profit
+    jobs.sort(key=lambda job: job.profit, reverse=True)
+
+    n = len(jobs)
+    result = [None] * n
+    slot = [False] * n
+
+    for job in jobs:
+        # Find a free slot for this job (latest possible before deadline)
+        for j in range(min(n, job.deadline) - 1, -1, -1):
+            if not slot[j]:
+                slot[j] = True
+                result[j] = job
+                break
+
+    # Prepare scheduled jobs and total profit
+    scheduled_jobs = []
+    total_profit = 0
+    for job in result:
+        if job:
+            scheduled_jobs.append((job.job_id, job.profit))
+            total_profit += job.profit
+
+    return scheduled_jobs, total_profit
+
+# Input from user
+num_jobs = int(input("Enter number of jobs: "))
+jobs = []
+for i in range(num_jobs):
+    job_id = input(f"Enter Job ID for job {i+1}: ")
+    deadline = int(input("Enter deadline: "))
+    profit = int(input("Enter profit: "))
+    jobs.append(Job(job_id, deadline, profit))
+
+# Run scheduler
+scheduled_jobs, total_profit = job_scheduling(jobs)
+
+# Output result
+print("\nScheduled Jobs:")
+for job_id, profit in scheduled_jobs:
+    print(f"Job ID: {job_id}, Profit: {profit}")
+print("Total Profit:", total_profit)
